@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Calendar</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+</head>
+<body>
+    <div id="calendar">
+        <div id="navigator">
+            <button id="prevWeek">Previous Week</button>
+            <button id="currentWeek">Current Week</button>
+            <button id="nextWeek">Next Week</button>
+        </div>
+        <!-- Add search functionality here -->
+        <div id="checkinoutbutton">
+            <button id="checkin">Check-In</button>
+            <button id="checkout">Check-Out</button>
+        </div>
+        
+        <table id="calendarTable">
+            <thead>
+                <tr id="calendarHeader">
+                    <th class="corner"></th>
+                    <!-- Date headers will be dynamically populated -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

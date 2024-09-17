@@ -1,0 +1,441 @@
+/* Global Styles */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+.schedule-box {
+    background-color: #e9ffd7;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px 0;
+    text-align: left;
+    
+}
+
+.schedule-box p {
+    margin: 0;
+}
+
+
+.unavailable-box i {
+    font-size: 10px;
+    color: #5a5a5a;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+.unavailable-box:hover i {
+    visibility: visible; /* Show the icon on hover */
+}
+
+.unavailable-box {
+    background-color: #fcabab;
+    border: 1px solid #ffc9c9;
+    border-radius: 5px;
+    padding: 9px;
+    margin: 5px 0;
+    text-align: left;
+}
+
+.unavailable-box p {
+    margin: 0;
+}
+
+#checkin, #checkout {
+    /* General styles */
+    font-size: 12px;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  #checkin {
+    /* Specific styles for checkin button */
+    background-color: #37d356; /* Light green color */
+  }
+  
+  #checkin:hover {
+    background-color: #a7b9a2; /* Darker light green on hover */
+  }
+  
+  #checkout {
+    /* Specific styles for checkout button */
+    background-color: #e22b2b; /* Light red color */
+  }
+  
+  #checkout:hover {
+    background-color: #b9a2a2; /* Darker light red on hover */
+  }
+
+/* Calendar Container */
+
+#calendar {
+    max-width: 1900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Add this to prevent table from overflowing */
+}
+
+/* Navigator */
+
+#navigator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#navigator button {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#navigator button:hover {
+    background-color: #f2f2f2;
+}
+
+#navigator button:active {
+    background-color: #eee;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+/* Calendar Table */
+
+#calendarTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border-spacing: 0; /* Add this to remove extra space between cells */
+}
+
+thead th {
+    background-color: #f7f7f7;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+tbody td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    position: relative; /* For positioning the unavailability options */
+}
+
+.colHeader {
+    background-color: #f7f7f7;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    color: #333;
+}
+
+.rowHeader {
+    background-color: #f7f7f7;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 15px;
+    font-size: 14px;
+    color: #333;
+    border-right: 1px solid #ddd;
+}
+
+.cell {
+    cursor: pointer;
+    position: relative;
+    min-width: 120px;
+    padding: 15px;
+    border-right: 1px solid #ddd;
+    transition: background-color 0.2s ease;
+}
+
+.cell:hover {
+    background-color: #f2f2f2;
+}
+
+.blocked {
+    background-color: #ff6961;
+    color: #fff;
+}
+
+/* Unavailability Options */
+.unavailability-options {
+    display: none;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    padding: 10px;
+}
+
+.unavailability-options button {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    padding: 5px;
+    font-size: 12px;
+    color: #333;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.unavailability-options button:hover {
+    background-color: #eee;
+}
+
+
+
+.three-dots-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 5px;
+    font-size: 12px;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.three-dots-button:hover {
+    background-color: #f2f2f2;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+.hourly-unavailability-popup {
+    width: 80%; /* take up 80% of the screen width */
+    max-width: 400px; /* set a maximum width to prevent it from getting too wide */
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.hourly-unavailability-popup input[type="date"], .hourly-unavailability-popup input[type="time"] {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+.hourly-unavailability-popup button {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: #fff;
+    cursor: pointer;
+}
+
+.hourly-unavailability-popup button:hover {
+    background-color: #3e8e41;
+}
+
+.cell {
+    position: relative; /* add this to create a containing block for the plus button */
+}
+
+.plus-button {
+    position: absolute; /* position the plus button absolutely */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: #337ab7; /* blue color */
+    background-color: #f7f7f7; /* light gray background */
+    border: none;
+    border-radius: 50%;
+    padding: 6px 10px;
+    cursor: pointer;
+    opacity: 0; /* hide the plus button by default */
+    transition: opacity 0.2s; /* add a transition effect */
+}
+
+.cell:hover .plus-button {
+    opacity: 1; /* show the plus button on hover */
+}
+
+/* Popup Styles */
+
+
+.popup {
+    position: fixed; /* Changed to fixed for better centering */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 600px; /* Adjust the width as needed */
+    height: 400px; /* Adjust the height as needed */
+    overflow-y: auto;
+    z-index: 1001; /* Ensure it is above the overlay */
+  }
+  
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Greyed out effect */
+    z-index: 1000; /* Ensure it is above other content */
+  }
+
+.popup p {
+    margin-bottom: 10px;
+}
+
+.popup input[type="radio"] {
+    margin-right: 10px;
+}
+
+.popup button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 5px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.popup .next-button {
+    background-color: #2196F3;
+}
+
+.popup .cancel-button {
+    background-color: #f44336;
+}
+
+.popup .create-button {
+    background-color: #4CAF50;
+}
+
+.popup input[type="text"],
+.popup input[type="date"],
+.popup input[type="time"] {
+    width: calc(100% - 20px);
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.popup label {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.popup strong {
+    display: block;
+    margin-top: 10px;
+}
+
+.popup input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/* Responsive adjustments */
+
+@media (max-width: 1200px) {
+    #calendar {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 992px) {
+    #calendar {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    #calendar {
+        max-width: 70%;
+    }
+    #calendarTable th,
+    #calendarTable td {
+        font-size: 12px;
+    }
+    .cell {
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    #calendar {
+        max-width: 90%;
+    }
+    #calendarTable th,
+    #calendarTable td {
+        font-size: 10px;
+    }
+    .cell {
+        min-width: 60px;
+    }
+}
