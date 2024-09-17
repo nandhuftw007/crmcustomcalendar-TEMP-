@@ -75,15 +75,7 @@ function createUnavailabilityOptions(tempId, cellDate, lead) {
         options.style.display = 'none';
     });
     options.appendChild(hourlyButton);
-
-
-
-  
-    
-   
-
     return options;
-    
 }
 
 function handleThreeDotsButtonClick(event) {
@@ -367,7 +359,9 @@ function fetchAndPopulateSchedulesAndTimeOff(leads, searchTerm = '') {
             populateCalendarBody([], [], []);
         });
 }
-
+function searchLeads(searchTerm) {
+    fetchAndPopulateCalendar(searchTerm);
+}
 function insertTimeOffRecord(tempId, cellDate) {
     const timeOffRecord = {
         "Name1": { "id": tempId },
@@ -392,106 +386,6 @@ function insertTimeOffRecord(tempId, cellDate) {
 }
 // Insert the new function here
 
-function isOverlapping(start1, end1, start2, end2) {
-    return (start1 < end2 && start2 < end1);
-}
-
-function checkForOverlappingSchedules(tempId, startDate, startTime, endDate, endTime, schedules) {
-    const newStart = moment(`${startDate} ${startTime}`, 'YYYY-MM-DD HH:mm');
-    const newEnd = moment(`${endDate} ${endTime}`, 'YYYY-MM-DD HH:mm');
-
-    for (let schedule of schedules) {
-        if (schedule.Schedule_For_Temp.id !== tempId) continue;
-
-        const existingStart = moment(schedule.Start_Date_and_Work_Start_Time);
-        const existingEnd = moment(schedule.End_Date_and_Work_End_Time);
-
-        if (isOverlapping(newStart, newEnd, existingStart, existingEnd)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function checkForOverlappingUnavailability(tempId, startDate, startTime, endDate, endTime, timeOffRecords) {
-    const newStart = moment(`${startDate} ${startTime}`, 'YYYY-MM-DD HH:mm');
-    const newEnd = moment(`${endDate} ${endTime}`, 'YYYY-MM-DD HH:mm');
-
-    for (let record of timeOffRecords) {
-        if (record.Name1.id !== tempId) continue;
-
-        const existingStart = moment(record.From_Date_Time);
-        const existingEnd = moment(record.To_Date);
-
-        if (isOverlapping(newStart, newEnd, existingStart, existingEnd)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function createShiftScheduleRecord(tempId, scheduleName, startDate, startTime, endDate, endTime, frequency, selectedAccountId, selectedDealId) {
-    const startDateTime = moment(`${startDate} ${startTime}`, 'YYYY-MM-DD HH:mm').toDate();
-    const endDateTime = moment(`${endDate} ${endTime}`, 'YYYY-MM-DD HH:mm').toDate();
-
-    // Fetch existing schedules and time off records
-    ZOHO.CRM.API.getAllRecords({ Entity: "Shift_Schedule", sort_order: "asc", sort_by: "Start_Date_and_Work_Start_Time" })
-        .then(function(response) {
-            const schedules = response.data;
-
-            ZOHO.CRM.API.getAllRecords({ Entity: "Time_Off", sort_order: "asc", sort_by: "From_Date_Time" })
-                .then(function(response) {
-                    const timeOffRecords = response.data;
-
-                    if (checkForOverlappingSchedules(tempId, startDate, startTime, endDate, endTime, schedules)) {
-                        alert("Error: The schedule overlaps with an existing schedule.");
-                        return;
-                    }
-
-                    if (checkForOverlappingUnavailability(tempId, startDate, startTime, endDate, endTime, timeOffRecords)) {
-                        alert("Error: The schedule overlaps with an existing unavailability.");
-                        return;
-                    }
-
-                    const shiftScheduleRecord = {
-                        "Schedule_For_Temp": tempId,
-                        "Client_Name": selectedAccountId,
-                        "Job": selectedDealId,
-                        "Name": scheduleName,
-                        "Start_Date_and_Work_Start_Time": moment(startDateTime).format('YYYY-MM-DDTHH:mm:ssZ'), // Format as ISO 8601 string
-                        "End_Date_and_Work_End_Time": moment(endDateTime).format('YYYY-MM-DDTHH:mm:ssZ'), // Format as ISO 8601 string
-                        "Days_in_the_Week": frequency
-                    };
-
-                    ZOHO.CRM.API.insertRecord({ Entity: "Shift_Schedule", APIData: shiftScheduleRecord })
-                        .then(function(response) {
-                            console.log('Shift schedule record inserted successfully:', response); // Log the API response
-                            if (response.data && response.data.length > 0 && response.data[0].code === "SUCCESS") {
-                                console.log('Shift Schedule Record created successfully!');
-                                alert("Shift Schedule Record created successfully!");
-                                fetchAndPopulateCalendar(); // Refresh the calendar to show the updated data
-                            } else {
-                                console.error('Error creating Shift Schedule Record:', response.data);
-                                alert("Failed to create Shift Schedule Record: " + (response.data[0].message || "Unknown error"));
-                                searchLeads(searchTerm);
-                            }
-                        })
-                        .catch(function(error) {
-                            console.error('Error creating Shift Schedule Record:', error);
-                            alert('An error occurred while creating the Shift Schedule Record. Check the console for details.');
-                        });
-            
-                })
-                .catch(function(error) {
-                    console.error('Error fetching Time Off records:', error);
-                    alert('An error occurred while fetching Time Off records. Check the console for details.');
-                });
-        })
-        .catch(function(error) {
-            console.error('Error fetching Schedules:', error);
-            alert('An error occurred while fetching Schedules. Check the console for details.');
-        });
-}
 
 let hourlyUnavailabilityPopup;
 let backdropElement;
@@ -543,90 +437,49 @@ function markUnavailableHourly(tempId, cellDate) {
                 return;
             }
 
-            // Check if start time is before end time
-            if (moment(startTime, 'HH:mm').isAfter(moment(endTime, 'HH:mm'))) {
-                errorMessage.innerText = 'Start time cannot be after end time.';
-                return;
+            // Update cell for hourly unavailability
+            function updateCellForHourlyUnavailability(tempId, cellDate, startTime, endTime) {
+                let formattedCellDate = moment(cellDate).format('YYYY-MM-DD');
+                let formattedStartTime = moment(`${formattedCellDate} ${startTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss');
+                let formattedEndTime = moment(`${formattedCellDate} ${endTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss');
+
+                var recordData = {
+                    "Name1": tempId,
+                    "Unavailability": "Hourly",
+                    "From_Date_Time": formattedStartTime,
+                    "To_Date": formattedEndTime
+                };
+
+                ZOHO.CRM.API.insertRecord({ Entity: "Time_Off", APIData: recordData, Trigger: [] })
+                    .then(function(data) {
+                        console.log("Insert Response: ", data);
+                        if (data.data && data.data.length > 0 && data.data[0].code === "SUCCESS") {
+                            alert("Hourly Unavailability Record created successfully! ");
+                            let cellSelector = `td[data-time*='${moment(cellDate).format('MMM D, YYYY')}'][data-temp-id='${tempId}']`;
+                            let cell = document.querySelector(cellSelector);
+                            if (cell) {
+                                let unavailabilityHtml = `
+                                    <div class="unavailable-box">
+                                        <p>Unavailable (${startTime} - ${endTime})</p><i class="fa-solid fa-trash"></i>
+                                    </div>
+                                `;
+                                cell.innerHTML = unavailabilityHtml;
+                                cell.classList.add('unavailable'); // Mark the cell as unavailable
+                            }
+                            fetchAndPopulateCalendar(); // Call this function to re-render the calendar
+                        } else {
+                            alert("Failed to create Hourly Unavailability Record: " + (data.data[0].message || "Unknown error"));
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error inserting Hourly Unavailability Record:', error);
+                        alert('An error occurred while creating the Hourly Unavailability Record. Check the console for details. ');
+                    });
             }
 
-            // Check if selected date is in the past
-            // if (moment(date).isBefore(moment(), 'day')) {
-            //     errorMessage.innerText = 'Cannot mark unavailability for a past date.';
-            //     return;
-            // }
-
-            // Fetch existing schedules and time off records
-            ZOHO.CRM.API.getAllRecords({ Entity: "Shift_Schedule", sort_order: "asc", sort_by: "Start_Date_and_Work_Start_Time" })
-                .then(function(response) {
-                    const schedules = response.data;
-
-                    ZOHO.CRM.API.getAllRecords({ Entity: "Time_Off", sort_order: "asc", sort_by: "From_Date_Time" })
-                        .then(function(response) {
-                            const timeOffRecords = response.data;
-
-                            if (checkForOverlappingSchedules(tempId, date, startTime, date, endTime, schedules)) {
-                                errorMessage.innerText = "Error: The unavailability overlaps with an existing schedule.";
-                                return;
-                            }
-
-                            if (checkForOverlappingUnavailability(tempId, date, startTime, date, endTime, timeOffRecords)) {
-                                errorMessage.innerText = "Error: The unavailability overlaps with an existing unavailability.";
-                                return;
-                            }
-
-                            // Update cell for hourly unavailability
-                            function updateCellForHourlyUnavailability(tempId, cellDate, startTime, endTime) {
-                                let formattedCellDate = moment(cellDate).format('YYYY-MM-DD');
-                                let formattedStartTime = moment(`${formattedCellDate} ${startTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss');
-                                let formattedEndTime = moment(`${formattedCellDate} ${endTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss');
-
-                                var recordData = {
-                                    "Name1": tempId,
-                                    "Unavailability": "Hourly",
-                                    "From_Date_Time": formattedStartTime,
-                                    "To_Date": formattedEndTime
-                                };
-
-                                ZOHO.CRM.API.insertRecord({ Entity: "Time_Off", APIData: recordData, Trigger: [] })
-                                    .then(function(data) {
-                                        console.log("Insert Response: ", data);
-                                        if (data.data && data.data.length > 0 && data.data[0].code === "SUCCESS") {
-                                            alert("Hourly Unavailability Record created successfully! ");
-                                            let cellSelector = `td[data-time*='${moment(cellDate).format('MMM D, YYYY')}'][data-temp-id='${tempId}']`;
-                                            let cell = document.querySelector(cellSelector);
-                                            if (cell) {
-                                                let unavailabilityHtml = `
-                                                    <div class="unavailable-box">
-                                                        <p>Unavailable (${startTime} - ${endTime})</p><i class="fa-solid fa-trash"></i>
-                                                    </div>
-                                                `;
-                                                cell.innerHTML = unavailabilityHtml;
-                                                cell.classList.add('unavailable'); // Mark the cell as unavailable
-                                            }
-                                            fetchAndPopulateCalendar(); // Call this function to re-render the calendar
-                                        } else {
-                                            alert("Failed to create Hourly Unavailability Record: " + (data.data[0].message || "Unknown error"));
-                                        }
-                                    })
-                                    .catch(function(error) {
-                                        console.error('Error inserting Hourly Unavailability Record:', error);
-                                        alert('An error occurred while creating the Hourly Unavailability Record. Check the console for details. ');
-                                    });
-                            }
-
-                            updateCellForHourlyUnavailability(tempId, cellDate, startTime, endTime);
-                            hourlyUnavailabilityPopup.remove(); // Remove the popup
-                            backdropElement.remove(); // Remove the backdrop
-                        })
-                        .catch(function(error) {
-                            console.error('Error fetching Time Off records:', error);
-                            errorMessage.innerText = 'An error occurred while fetching Time Off records.';
-                        });
-                })
-                .catch(function(error) {
-                    console.error('Error fetching Schedules:', error);
-                    errorMessage.innerText = 'An error occurred while fetching Schedules.';
-                });
+            updateCellForHourlyUnavailability(tempId, cellDate, startTime, endTime);
+            hourlyUnavailabilityPopup.remove(); // Remove the popup
+            backdropElement.remove(); // Remove the backdrop
         });
 
         document.getElementById('cancel-hourly-unavailability').addEventListener('click', () => {
